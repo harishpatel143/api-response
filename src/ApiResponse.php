@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018, Multidots Solutions Pvt Ltd (https://www.multidots.com)
+ * Copyright 2018, Multidots Solutions Pvt Ltd (https://www.multidots.com).
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
@@ -20,21 +20,21 @@ use Google_Client;
 use Google_Service_Oauth2;
 
 /**
- * Account controller
+ * Account controller.
  *
  * This controller file used to handle basic login related functionality
  */
-class AccountController extends AppController {
-
+class ApiResponse extends AppController
+{
     /**
-     * Controller name
+     * Controller name.
      *
      * @var string
      */
     public $name = 'Account';
 
     /**
-     * Active side-bar menu
+     * Active side-bar menu.
      *
      * @var string
      */
@@ -52,7 +52,7 @@ class AccountController extends AppController {
     }
 
     /**
-     * Login method
+     * Login method.
      *
      * @return \Cake\Http\Response|void
      */
@@ -82,11 +82,11 @@ class AccountController extends AppController {
 
                         $reqData = $this->request->getData();
                         if (!empty($reqData['hash_tags']) && !empty($recentUrl)) {
-                            $recentUrl = $recentUrl . $reqData['hash_tags'];
+                            $recentUrl = $recentUrl.$reqData['hash_tags'];
                         }
                         $recentUrl = !empty($recentUrl) ? $recentUrl : '/';
-                        return $this->redirect($recentUrl);
 
+                        return $this->redirect($recentUrl);
                     } else {
                         $this->Flash->set(__('Invalid email or password. Please try again.'), ['element' => 'error']);
                     }
@@ -100,7 +100,7 @@ class AccountController extends AppController {
     }
 
     /**
-     * Gmail login
+     * Gmail login.
      *
      * @return \Cake\Http\Response|void
      */
@@ -111,7 +111,7 @@ class AccountController extends AppController {
         $client->setClientSecret(Configure::read('Google.googleClientSecret'));
         $client->setRedirectUri(Configure::read('Google.googleRedirectUrl'));
         $client->setScopes([
-            "https://www.googleapis.com/auth/userinfo.profile",
+            'https://www.googleapis.com/auth/userinfo.profile',
             'https://www.googleapis.com/auth/userinfo.email',
         ]);
         $url = $client->createAuthUrl();
@@ -119,7 +119,7 @@ class AccountController extends AppController {
     }
 
     /**
-     * Gmail auth redirect action
+     * Gmail auth redirect action.
      *
      * @return \Cake\Http\Response|void
      */
@@ -130,7 +130,7 @@ class AccountController extends AppController {
         $client->setClientSecret(Configure::read('Google.googleClientSecret'));
         $client->setRedirectUri(Configure::read('Google.googleRedirectUrl'));
         $client->setScopes([
-            "https://www.googleapis.com/auth/userinfo.profile",
+            'https://www.googleapis.com/auth/userinfo.profile',
             'https://www.googleapis.com/auth/userinfo.email',
         ]);
         $client->setAccessType('offline');
@@ -148,6 +148,7 @@ class AccountController extends AppController {
             $this->request->Session()->write('access_token', $client->getAccessToken());
             $oauth2 = new Google_Service_Oauth2($client);
             $user = $oauth2->userinfo->get();
+
             try {
                 if (!empty($user)) {
                     $result = $usersTable->find('all')
@@ -184,13 +185,12 @@ class AccountController extends AppController {
                                 return $this->redirect(['_name' => 'account-login']);
                             }
                         }
-                    }
-                    else if (!empty($result) && $result['status'] != Configure::read('Status.active')){
+                    } elseif (!empty($result) && $result['status'] != Configure::read('Status.active')) {
                         $this->request->session()->destroy();
                         $this->Flash->error(__('Your account is inactive.'));
+
                         return $this->redirect(['_name' => 'account-login']);
-                    }
-                    else {
+                    } else {
                         $this->request->session()->destroy();
                         $this->Flash->error(__('Looks like, You are not registered with MD-PMS.'));
 
@@ -211,8 +211,10 @@ class AccountController extends AppController {
     }
 
     /**
-     * View Profile method
+     * View Profile method.
+     *
      * @param type $id user id
+     *
      * @return \Cake\Http\Response|void
      */
     public function profile($id = null)
@@ -221,20 +223,20 @@ class AccountController extends AppController {
         if (empty($id)) {
             $sessionData = $this->AccessControl->user();
             $userDetails = $users->find()
-                            ->contain(['Roles' => ['fields' => ['id', 'name']],
-                                'Departments' => ['fields' => ['id', 'name'], 'joinType' => 'Left'],
+                            ->contain(['Roles'  => ['fields' => ['id', 'name']],
+                                'Departments'   => ['fields' => ['id', 'name'], 'joinType' => 'Left'],
                                 'ProjectsUsers' => ['fields' => ['id', 'user_id']],
-                                'TasksUsers' => ['fields' => ['id', 'user_id']],
-                                'Designations' => ['fields' => ['id', 'name']]
+                                'TasksUsers'    => ['fields' => ['id', 'user_id']],
+                                'Designations'  => ['fields' => ['id', 'name']],
                             ])
                             ->where(['Users.id' => $sessionData['id']])->first();
         } else {
             $userDetails = $users->find()
-                            ->contain(['Roles' => ['fields' => ['id', 'name']],
-                                'Departments' => ['fields' => ['id', 'name'], 'joinType' => 'Left'],
+                            ->contain(['Roles'  => ['fields' => ['id', 'name']],
+                                'Departments'   => ['fields' => ['id', 'name'], 'joinType' => 'Left'],
                                 'ProjectsUsers' => ['fields' => ['id', 'user_id']],
-                                'TasksUsers' => ['fields' => ['id', 'user_id']],
-                                'Designations' => ['fields' => ['id', 'name']]
+                                'TasksUsers'    => ['fields' => ['id', 'user_id']],
+                                'Designations'  => ['fields' => ['id', 'name']],
                             ])
                             ->where(['Users.id' => $id, 'Users.status' => Configure::read('Status.active')])->first();
         }
@@ -255,15 +257,17 @@ class AccountController extends AppController {
         $this->set('title', [__('User Profile')]);
         $this->pageNavigation = [
             'view' => [
-                'title' => h('User Profile'),
+                'title'  => h('User Profile'),
                 'active' => true,
             ],
         ];
     }
 
     /**
-     * Edit Profile method
+     * Edit Profile method.
+     *
      * @param type $id user id
+     *
      * @return \Cake\Http\Response|void
      */
     public function editProfile($id = null)
@@ -306,8 +310,8 @@ class AccountController extends AppController {
                     $user->avatar = '';
                 }
                 if ($users->save($user)) {
-                    if (!empty($oldProfile) && ($this->request->data['delete_image'] == 1) && file_exists(Configure::read('Media.profileImagePath') . $oldProfile)) {
-                        unlink(Configure::read('Media.profileImagePath') . $oldProfile); //Remove Old Image
+                    if (!empty($oldProfile) && ($this->request->data['delete_image'] == 1) && file_exists(Configure::read('Media.profileImagePath').$oldProfile)) {
+                        unlink(Configure::read('Media.profileImagePath').$oldProfile); //Remove Old Image
                     }
                     if ($user->id == $sessionData['id']) {
                         $this->AccessControl->setUser($user->toArray(), false);
@@ -334,7 +338,7 @@ class AccountController extends AppController {
         }
 
         $isClient = false;
-        if(Configure::read('Role.clients') == $sessionData['role_id']){
+        if (Configure::read('Role.clients') == $sessionData['role_id']) {
             $isClient = true;
         }
         $accountSettingActive = 1;
@@ -343,19 +347,21 @@ class AccountController extends AppController {
         $this->set('title', [__('Account Setting'), __('User Profile')]);
         $this->pageNavigation = [
             'users' => [
-                'title' => __('User Profile'),
-                'routeName' => 'account-profile'
+                'title'     => __('User Profile'),
+                'routeName' => 'account-profile',
             ],
             'view' => [
-                'title' => h('Account Setting'),
-                'active' => true
-            ]
+                'title'  => h('Account Setting'),
+                'active' => true,
+            ],
         ];
     }
 
     /**
-     * Account setting
+     * Account setting.
+     *
      * @param type $id user id
+     *
      * @return \Cake\Http\Response|void
      */
     public function accountSetting($id = null)
@@ -379,7 +385,7 @@ class AccountController extends AppController {
                     return $this->redirect(['_name' => 'account-profile']);
                 }
 
-                return $this->redirect('/users/' . $id);
+                return $this->redirect('/users/'.$id);
             }
         }
         $accountSettingActive = 1;
@@ -387,14 +393,14 @@ class AccountController extends AppController {
         $this->set('title', [__('Account Setting')]);
         $this->pageNavigation = [
             'view' => [
-                'title' => h('Account Setting'),
+                'title'  => h('Account Setting'),
                 'active' => true,
             ],
         ];
     }
 
     /**
-     * Check right password for admin
+     * Check right password for admin.
      *
      * @return \Cake\Http\Response|void
      */
@@ -404,6 +410,7 @@ class AccountController extends AppController {
             throw new NotFoundException();
         }
         $this->viewBuilder()->layout('ajax')->helpers(['AccessControl']);
+
         try {
             $profiles = TableRegistry::get('Users');
             $data = $profiles->find()->where(['Users.password' => md5($this->request->data['current_password']), 'Users.id ' => $this->request->data['id']]);
@@ -417,7 +424,7 @@ class AccountController extends AppController {
     }
 
     /**
-     * Forgot password method
+     * Forgot password method.
      *
      * @return \Cake\Http\Response|void
      */
@@ -445,8 +452,8 @@ class AccountController extends AppController {
                                     $replacementArr['USER_NAME'] = $userData->first_name;
                                     $replacementArr['USER_EMAIL'] = $userData->email;
                                     $replacementArr['TOKEN'] = $token;
-                                    $replacementArr['LOGIN_PAGE_LINK'] = '<a href="' . Router::url('/account/login', true) . '" title="Click to login" target="_blank">' . Router::url('/account/login', true) . '</a>';
-                                    $replacementArr['CHANGE_PASSWORD_LINK'] = '<a href="' . Router::url('/account/reset-password/' . $token, true) . '" title="Click to change your password" target="_blank"> Click here.</a>';
+                                    $replacementArr['LOGIN_PAGE_LINK'] = '<a href="'.Router::url('/account/login', true).'" title="Click to login" target="_blank">'.Router::url('/account/login', true).'</a>';
+                                    $replacementArr['CHANGE_PASSWORD_LINK'] = '<a href="'.Router::url('/account/reset-password/'.$token, true).'" title="Click to change your password" target="_blank"> Click here.</a>';
 
                                     $EmailSubject = $this->Common->replaceEmailContent($emailTemplateData->subject, $replacementArr);
                                     $EmailContent = $this->Common->replaceEmailContent($emailTemplateData->template_text, $replacementArr);
@@ -482,8 +489,8 @@ class AccountController extends AppController {
     }
 
     /**
-
-     * Check user email forgot password
+     * Check user email forgot password.
+     *
      * @throws NotFoundException
      */
     public function checkEmailExists()
@@ -491,6 +498,7 @@ class AccountController extends AppController {
         if (!$this->request->is('ajax')) {
             throw new NotFoundException();
         }
+
         try {
             $user = TableRegistry::get('Users');
             $data = $user->find()->where(['Users.email' => $this->request->data['email'], 'Users.status' => Configure::read('Status.active')]);
@@ -504,7 +512,7 @@ class AccountController extends AppController {
     }
 
     /**
-     * Reset password method
+     * Reset password method.
      *
      * @return \Cake\Http\Response|void
      */
@@ -552,7 +560,7 @@ class AccountController extends AppController {
     }
 
     /**
-     * Logout method
+     * Logout method.
      *
      * @return \Cake\Http\Response|void
      */
@@ -562,5 +570,4 @@ class AccountController extends AppController {
 
         return $this->redirect(Router::url(['_name' => 'account-login']));
     }
-
 }
