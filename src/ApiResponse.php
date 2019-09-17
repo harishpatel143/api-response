@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018, Multidots Solutions Pvt Ltd (https://www.multidots.com).
+ * 
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
